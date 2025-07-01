@@ -32,10 +32,13 @@ Given a record of every transaction during a three-month period, the API calcula
 
 ```
 src/main/java/com/project/api_reward_points_system/
+├── config/             # Application configuration
+├── util/               # Utility classes (error response, etc.)
 ├── controller/         # REST API controllers
 ├── service/            # Business logic for reward calculation
-├── model/              # Data models (Transaction, RewardResponse)
-└── repository/         # In-memory data source
+├── model/              # Data models (Transaction, RewardResponse, ErrorResponse)
+└── repository/         # Data access layer (mocked)
+
 src/test/java/com/project/api_reward_points_system/
 README.md
 .gitignore
@@ -75,6 +78,47 @@ GET /api/rewards
   ...
 ]
 ```
+### API Endpoints
+
+- **GET /rewards**  
+  Returns a list of customer rewards.  
+  If no rewards are found, returns an error response.
+  If exception occurred, returns an error response.
+
+**Sample Response for success:**
+```json
+[
+  {
+    "customerId": 1,
+    "monthlyPoints": {
+      "2024-04": 90,
+      "2024-05": 25,
+      "2024-06": 250
+    },
+    "totalPoints": 365
+  },
+  ...
+]
+
+**No Content (No Rewards Found):**
+```json
+{
+  "details": null,
+  "errorMessage": "No rewards found",
+  "statusCode": 404
+}
+```
+
+**Exception Occurred (e.g., Internal Server Error):**
+```json
+{
+  "details": null,
+  "errorMessage": "An unexpected error occurred. Please try again later.",
+  "statusCode": 500
+}
+```
+
+These responses should be returned by your API in the respective scenarios, using your `ErrorResponse` structure.
 
 ## Reward Calculation Logic
 
