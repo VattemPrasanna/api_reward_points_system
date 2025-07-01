@@ -13,4 +13,6 @@ public class PropertyConfig {
     private int maximumRange;
     @Value("${reward.minimumRange}")
     private int minimumRange;
+    @Value("${reward.timePeriod}")
+    private int timePeriod;
 }
