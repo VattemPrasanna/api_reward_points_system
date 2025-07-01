@@ -77,7 +77,7 @@ GET /api/rewards
   },
   ...
 ]
-```
+
 ### API Endpoints
 
 - **GET /rewards**  
