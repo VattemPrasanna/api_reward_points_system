@@ -1,5 +1,6 @@
 package com.project.api_reward_points_system.service;
 
+import com.project.api_reward_points_system.configuration.PropertyConfig;
 import com.project.api_reward_points_system.model.Transaction;
 import com.project.api_reward_points_system.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,9 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,11 +20,16 @@ class RewardServiceTest {
 
     private RewardService rewardService;
     private TransactionRepository transactionRepository;
+    private PropertyConfig propertyConfig;
 
     @BeforeEach
     void setUp() {
         transactionRepository = mock(TransactionRepository.class);
-        rewardService = new RewardService(transactionRepository);
+        propertyConfig = mock(PropertyConfig.class);
+        when(propertyConfig.getPointsPerDollar()).thenReturn(2);
+        when(propertyConfig.getMinimumRange()).thenReturn(50);
+        when(propertyConfig.getMaximumRange()).thenReturn(100);
+        rewardService = new RewardService(transactionRepository, propertyConfig);
     }
 
     @Test

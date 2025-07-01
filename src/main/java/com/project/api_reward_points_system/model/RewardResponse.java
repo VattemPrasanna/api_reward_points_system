@@ -15,5 +15,4 @@ public class RewardResponse {
     private Long customerId;
     private Map<String, Integer> monthlyPoints;
     private int totalPoints;
-
 }
