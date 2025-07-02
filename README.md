@@ -54,42 +54,30 @@ build.gradle
    ```
 3. Access the API endpoint:
    ```
-GET /api/rewards
-   ```
-   Returns a list of customers with their monthly and total reward points.
 
-## API Endpoint
-
-- **GET /api/rewards**  
-  Returns reward points per customer, per month, and total.
-
-**Sample Response:**
-```json
-[
-  {
-    "customerId": 1,
-    "monthlyPoints": {
-      "2024-04": 90,
-      "2024-05": 25,
-      "2024-06": 250
-    },
-    "totalPoints": 365
-  },
-  ...
-]
 
 ### API Endpoints
-
+```
 To Fetch all Customer Rewards:
 http://www.localhost:8080/api/rewards
 
 To Fetch specific Customer Rewards:
 http://www.localhost:8080/api/rewards/{customerId}
+```
 
-- **GET /rewards**  
-  Returns a list of customer rewards.  
-  If no rewards are found, returns an error response.
-  If exception occurred, returns an error response.
+```
+GET /api/rewards
+```
+Returns a list of customer rewards.  
+If no rewards are found, returns an error response.
+If exception occurred, returns an error response.
+
+```
+GET /api/rewards/{customerId}
+```
+Returns a specific customer rewards.  
+If no rewards are found, returns an error response.
+If exception occurred, returns an error response.
 
 **Sample Response for success:**
 ```json
@@ -103,8 +91,9 @@ http://www.localhost:8080/api/rewards/{customerId}
     },
     "totalPoints": 365
   },
-  ...
+  "..."
 ]
+```
 
 **No Content (No Rewards Found):**
 ```json
@@ -113,8 +102,8 @@ http://www.localhost:8080/api/rewards/{customerId}
   "errorMessage": "No rewards found",
   "statusCode": 404
 }
-```
 
+```
 **Exception Occurred (e.g., Internal Server Error):**
 ```json
 {
