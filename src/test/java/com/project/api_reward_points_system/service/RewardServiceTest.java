@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 class RewardServiceTest {
 
-    private RewardService rewardService;
+    private RewardServiceImp rewardService;
     private TransactionRepository transactionRepository;
     private PropertyConfig propertyConfig;
 
@@ -29,7 +29,7 @@ class RewardServiceTest {
         when(propertyConfig.getPointsPerDollar()).thenReturn(2);
         when(propertyConfig.getMinimumRange()).thenReturn(50);
         when(propertyConfig.getMaximumRange()).thenReturn(100);
-        rewardService = new RewardService(transactionRepository, propertyConfig);
+        rewardService = new RewardServiceImp(transactionRepository, propertyConfig);
     }
 
     @Test

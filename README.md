@@ -33,7 +33,7 @@ Given a record of every transaction during a three-month period, the API calcula
 ```
 src/main/java/com/project/api_reward_points_system/
 ├── config/             # Application configuration
-├── util/               # Utility classes (error response, etc.)
+├── util/               # Utility classes
 ├── controller/         # REST API controllers
 ├── service/            # Business logic for reward calculation
 ├── model/              # Data models (Transaction, RewardResponse, ErrorResponse)
@@ -54,16 +54,32 @@ build.gradle
    ```
 3. Access the API endpoint:
    ```
+
+
+### API Endpoints
+```
+To Fetch all Customer Rewards:
+http://www.localhost:8080/api/rewards
+
+To Fetch specific Customer Rewards:
+http://www.localhost:8080/api/rewards/{customerId}
+```
+
+```
 GET /api/rewards
-   ```
-   Returns a list of customers with their monthly and total reward points.
+```
+Returns a list of customer rewards.  
+If no rewards are found, returns an error response.
+If exception occurred, returns an error response.
 
-## API Endpoint
+```
+GET /api/rewards/{customerId}
+```
+Returns a specific customer rewards.  
+If no rewards are found, returns an error response.
+If exception occurred, returns an error response.
 
-- **GET /api/rewards**  
-  Returns reward points per customer, per month, and total.
-
-**Sample Response:**
+**Sample Response for success:**
 ```json
 [
   {
@@ -75,30 +91,9 @@ GET /api/rewards
     },
     "totalPoints": 365
   },
-  ...
+  "..."
 ]
 ```
-### API Endpoints
-
-- **GET /rewards**  
-  Returns a list of customer rewards.  
-  If no rewards are found, returns an error response.
-  If exception occurred, returns an error response.
-
-**Sample Response for success:** 
-```json
-[
-  {
-    "customerId": 1,
-    "monthlyPoints": {
-      "2024-04": 90,
-      "2024-05": 25,
-      "2024-06": 250
-    },
-    "totalPoints": 365
-  },
-  ...
-]
 
 **No Content (No Rewards Found):**
 ```json
@@ -107,8 +102,8 @@ GET /api/rewards
   "errorMessage": "No rewards found",
   "statusCode": 404
 }
-```
 
+```
 **Exception Occurred (e.g., Internal Server Error):**
 ```json
 {

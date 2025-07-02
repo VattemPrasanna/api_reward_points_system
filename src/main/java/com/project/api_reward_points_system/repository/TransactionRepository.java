@@ -8,10 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Simulates a data source for transactions.
  * Used mock data for testing purposes. We can configure a real database later with configuration.
+ * If we are working with real database, we have make TransactionRepository as interface and need to extends JPA repository interface to perform crud operations.
  */
 @Repository
 public class TransactionRepository {
@@ -35,9 +37,21 @@ public class TransactionRepository {
                 new Transaction(2L, 60, LocalDate.of(2024, 3, 25)),
                 new Transaction(3L, 500, LocalDate.of(2025, 3, 10)),
                 new Transaction(3L, 620, LocalDate.of(2025, 9, 3)),
-                new Transaction(4L, 30, LocalDate.of(2025, 10, 12)),
-                new Transaction(4L, 150, LocalDate.of(2025, 12, 20)),
-                new Transaction(4L, 60, LocalDate.of(2025, 11, 25))
+                new Transaction(4L, 30, LocalDate.of(2025, 1, 12)),
+                new Transaction(4L, 150, LocalDate.of(2025, 2, 20)),
+                new Transaction(4L, 60, LocalDate.of(2025, 3, 25))
         );
+    }
+    /**
+     * Retrieves transactions for a specific customer by their ID.
+     *
+     * @param customerId the ID of the customer
+     * @return List of Transaction objects for the specified customer
+     */
+
+    public List<Transaction> findById(Long customerId) {
+        return findAll().stream()
+                .filter(tx -> tx.getCustomerId().equals(customerId))
+                .collect(Collectors.toList());
     }
 }
