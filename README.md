@@ -33,7 +33,7 @@ Given a record of every transaction during a three-month period, the API calcula
 ```
 src/main/java/com/project/api_reward_points_system/
 ├── config/             # Application configuration
-├── util/               # Utility classes (error response, etc.)
+├── util/               # Utility classes
 ├── controller/         # REST API controllers
 ├── service/            # Business logic for reward calculation
 ├── model/              # Data models (Transaction, RewardResponse, ErrorResponse)
