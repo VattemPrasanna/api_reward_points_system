@@ -26,9 +26,7 @@ class RewardServiceTest {
     void setUp() {
         transactionRepository = mock(TransactionRepository.class);
         propertyConfig = mock(PropertyConfig.class);
-        when(propertyConfig.getPointsPerDollar()).thenReturn(2);
-        when(propertyConfig.getMinimumRange()).thenReturn(50);
-        when(propertyConfig.getMaximumRange()).thenReturn(100);
+        when(propertyConfig.getTimePeriod()).thenReturn(2);
         rewardService = new RewardServiceImp(transactionRepository, propertyConfig);
     }
 
@@ -41,18 +39,33 @@ class RewardServiceTest {
     }
 
     @Test
-    void testCalculatePoints_Exactly100() {
-        assertEquals(50, rewardService.calculatePoints(100));
+    void testCalculatePoints_AboveMaximumRange() {
+        assertEquals(90, rewardService.calculatePoints(120));
     }
 
     @Test
-    void testCalculatePoints_Exactly50() {
+    void testCalculatePoints_BetweenMinimumAndMaximumRange() {
+        assertEquals(10, rewardService.calculatePoints(60));
+    }
+
+    @Test
+    void testCalculatePoints_ExactlyAtMinimumRange() {
         assertEquals(0, rewardService.calculatePoints(50));
     }
 
     @Test
+    void testCalculatePoints_BelowMinimumRange() {
+        assertEquals(0, rewardService.calculatePoints(30));
+    }
+
+    @Test
+    void testCalculatePoints_ExactlyAtMaximumRange() {
+        assertEquals(50, rewardService.calculatePoints(100));
+    }
+
+    @Test
     void testCalculatePoints_NegativeAmount() {
-        assertEquals(0, rewardService.calculatePoints(-10));
+        assertThrows(IllegalArgumentException.class, () -> rewardService.calculatePoints(-50));
     }
 
     @Test
@@ -94,7 +107,7 @@ class RewardServiceTest {
     }
 
     @Test
-    void testCalculateRewards_EmptyList() {
+    void testCalculateRewards_EmptyTransactionList() {
         when(transactionRepository.findAll()).thenReturn(List.of());
         var results = rewardService.calculateRewards();
         assertTrue(results.isEmpty());
@@ -111,8 +124,51 @@ class RewardServiceTest {
     void testCalculateRewards_TransactionWithNegativeAmount() {
         List<Transaction> txs = List.of(new Transaction(1L, -100, LocalDate.of(2024, 4, 10)));
         when(transactionRepository.findAll()).thenReturn(txs);
-        var results = rewardService.calculateRewards();
-        assertEquals(1, results.size());
-        assertEquals(0, results.get(0).getTotalPoints());
+        assertThrows(RuntimeException.class, () -> rewardService.calculateRewards());
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_NullTransactionList() {
+        assertThrows(NullPointerException.class, () -> rewardService.calculateRewardsByCustomerId(1L, null));
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_EmptyTransactionList() {
+        assertThrows(NullPointerException.class, ()->rewardService.calculateRewardsByCustomerId(1L, List.of()));
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_NullCustomerId() {
+        List<Transaction> txs = List.of(new Transaction(1L, 120, LocalDate.of(2024, 4, 10)));
+        assertThrows(NullPointerException.class, () -> rewardService.calculateRewardsByCustomerId(null, txs));
+    }
+
+    @Test
+    void testCalculateRewards_RepositoryThrowsException() {
+        when(transactionRepository.findAll()).thenThrow(new RuntimeException("Error occurred while fetching transactions from DB"));
+        assertThrows(RuntimeException.class, () -> rewardService.calculateRewards());
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_MultipleTransactions() {
+        List<Transaction> txs = Arrays.asList(
+                new Transaction(1L, 120, LocalDate.of(2025, 4, 10)),
+                new Transaction(1L, 80, LocalDate.of(2025, 4, 15)),
+                new Transaction(1L, 40, LocalDate.of(2025, 4, 5))
+        );
+        var result = rewardService.calculateRewardsByCustomerId(1L, txs);
+        assertEquals(90+30+0, result.getTotalPoints());
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_TransactionWithNullDate() {
+        List<Transaction> txs = List.of(new Transaction(1L, 120, null));
+        assertThrows(NullPointerException.class, () -> rewardService.calculateRewardsByCustomerId(1L, txs));
+    }
+
+    @Test
+    void testCalculateRewardsByCustomerId_TransactionWithNegativeAmount() {
+        List<Transaction> txs = List.of(new Transaction(1L, -100, LocalDate.of(2024, 4, 10)));
+        assertThrows(RuntimeException.class, () -> rewardService.calculateRewardsByCustomerId(1L, txs));
     }
 }
