@@ -22,24 +22,30 @@ Given a record of every transaction during a three-month period, the API calcula
 
 - Calculates reward points per customer, per month, and total.
 - No hardcoded months; uses transaction dates for grouping.
-- RESTful endpoint to fetch reward points.
+- RESTful endpoint to fetch reward points for all customers and a specific customer.
 - In-memory data simulates transactions for multiple customers.
 - Unit and integration tests, including negative and edge cases.
 - JavaDocs at class and method levels.
 - Follows Java coding standards and best practices.
+```
+```
 
 ## Project Structure
 
-```
 src/main/java/com/project/api_reward_points_system/
 ├── config/             # Application configuration
 ├── util/               # Utility classes (error response, etc.)
-├── controller/         # REST API controllers
+├── controller/         # REST APIs controller
 ├── service/            # Business logic for reward calculation
 ├── model/              # Data models (Transaction, RewardResponse, ErrorResponse)
-└── repository/         # Data access layer (mocked)
+├── repository/         # Data access layer (mocked)
+└── exception/          # Handlers for custom exceptions
 
 src/test/java/com/project/api_reward_points_system/
+├── controller/         # Unit test cases - controller
+└── service/            # Unit test cases - service
+
+application.properties  # Configuration file for the application
 README.md
 .gitignore
 build.gradle
@@ -49,34 +55,14 @@ build.gradle
 
 1. Clone the repository.
 2. Build and run the Spring Boot application using Gradle:
-   ```
+   
 ./gradlew bootRun
-   ```
-3. Access the API endpoint:
-   ```
-GET /api/rewards
-   ```
-   Returns a list of customers with their monthly and total reward points.
 
-## API Endpoint
+3. Access the API endpoint:
 
 - **GET /api/rewards**  
   Returns reward points per customer, per month, and total.
 
-**Sample Response:**
-```json
-[
-  {
-    "customerId": 1,
-    "monthlyPoints": {
-      "2024-04": 90,
-      "2024-05": 25,
-      "2024-06": 250
-    },
-    "totalPoints": 365
-  },
-  ...
-]
 
 ### API Endpoints
 
@@ -103,29 +89,31 @@ http://www.localhost:8080/api/rewards/{customerId}
     },
     "totalPoints": 365
   },
-  ...
+  "..."
 ]
-
-**No Content (No Rewards Found):**
+```
+**No Rewards Found:**
 ```json
 {
-  "details": null,
-  "errorMessage": "No rewards found",
-  "statusCode": 404
+   "data": null,
+   "errorMessage": "Records not found for customers",
+   "status": "NOT_FOUND",
+   "hasError": false
 }
 ```
 
-**Exception Occurred (e.g., Internal Server Error):**
+**Exception Occurred (e.g., Bad Request , Internal Server Error):**
 ```json
 {
-  "details": null,
-  "errorMessage": "An unexpected error occurred. Please try again later.",
-  "statusCode": 500
+   "data": "element cannot be mapped to a null key",
+   "errorMessage": "Failed to get rewards for customers",
+   "status": "400 BAD_REQUEST",
+   "hasError": true
 }
 ```
 
-These responses should be returned by your API in the respective scenarios, using your `ErrorResponse` structure.
-
+These responses should be returned by your API in the respective scenarios.
+```
 ## Reward Calculation Logic
 
 - For each transaction:
@@ -135,11 +123,11 @@ These responses should be returned by your API in the respective scenarios, usin
       Points = (amount - 50) * 1
     - If amount <= $50:  
       Points = 0
-
+```
 ## Testing
 
 - Unit and integration tests are included.
-- Tests cover multiple customers, multiple transactions, edge cases, and negative scenarios.
+- Tests cover multiple customers, multiple transactions, edge cases, negative and exception scenarios.
 
 ## Coding Standards
 
@@ -154,9 +142,10 @@ These responses should be returned by your API in the respective scenarios, usin
 
 ---
 
+```
+TECHNOLOGY STACK
+JAVA, Spring Boot 3.2.5, Gradle 8.4, JUnit 5, Mockito
+```
+
 **Author:**  
 VattemPrasanna
-
-**License:**  
-For educational/demo purposes.
-```

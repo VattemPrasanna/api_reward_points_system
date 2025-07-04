@@ -3,6 +3,7 @@ package com.project.api_reward_points_system.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 /**

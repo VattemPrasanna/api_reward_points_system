@@ -5,16 +5,15 @@ import org.springframework.http.HttpStatus;
 
 public final class appUtil {
 
-    public static ErrorResponse globalErrorResponse(String requestParam, String errorMessage, HttpStatus statusCode) {
-        ErrorResponse response = generateErrorResponse(requestParam, errorMessage, statusCode.name());
-        return response;
+    public static ErrorResponse globalErrorResponse(String requestParam, String errorMessage, HttpStatus status) {
+        return generateErrorResponse(requestParam, errorMessage, status.name());
     }
 
-    private static ErrorResponse generateErrorResponse(String requestParam, String errorMessage, String statusCode) {
+    private static ErrorResponse generateErrorResponse(String requestParam, String errorMessage, String status) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorMessage(errorMessage);
-        response.setStatusCode(statusCode);
-        response.setDetails(requestParam);
+        response.setStatus(status);
+        response.setData(requestParam);
         return response;
     }
 }

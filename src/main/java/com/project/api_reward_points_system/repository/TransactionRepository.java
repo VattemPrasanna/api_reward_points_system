@@ -41,6 +41,7 @@ public class TransactionRepository {
                 new Transaction(4L, 60, LocalDate.of(2025, 3, 25))
         );
     }
+
     /**
      * Retrieves transactions for a specific customer by their ID.
      *
@@ -49,6 +50,7 @@ public class TransactionRepository {
      */
 
     public List<Transaction> findById(Long customerId) {
+        logger.info("Retrieving transactions for customer ID: {}", customerId);
         return findAll().stream()
                 .filter(tx -> tx.getCustomerId().equals(customerId))
                 .collect(Collectors.toList());

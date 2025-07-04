@@ -7,12 +7,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class PropertyConfig {
-    @Value("${reward.pointsPerDollar}")
-    private int pointsPerDollar;
-    @Value("${reward.maximumRange}")
-    private int maximumRange;
-    @Value("${reward.minimumRange}")
-    private int minimumRange;
     @Value("${reward.timePeriod}")
     private int timePeriod;
 }

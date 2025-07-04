@@ -1,6 +1,7 @@
 package com.project.api_reward_points_system.controller;
 
 import com.project.api_reward_points_system.constants.AuthConstants;
+import com.project.api_reward_points_system.exception.RewardServiceException;
 import com.project.api_reward_points_system.model.ErrorResponse;
 import com.project.api_reward_points_system.model.RewardResponse;
 import com.project.api_reward_points_system.model.Transaction;
@@ -10,7 +11,6 @@ import com.project.api_reward_points_system.utilities.appUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,19 +45,20 @@ public class RewardController {
     @GetMapping()
     public ResponseEntity<?> getRewardsResponse() {
         logger.info("Processing request to get rewards at controller level started at {}", System.currentTimeMillis());
+        List<RewardResponse> rewards;
         try {
-            List<RewardResponse> rewards = rewardService.calculateRewards();
-            if (CollectionUtils.isEmpty(rewards)) {
-                ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.RECORDS_NOT_FOUND, HttpStatus.NOT_FOUND);
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-            }
-            logger.info("Returning {} rewards responses.", rewards.size());
-            return new ResponseEntity<>(rewards, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("Error occurred while processing rewards: {}", e.getMessage(), e);
-            ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.FAILED_TO_GET_REWARDS, HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+            rewards = rewardService.calculateRewards();
+        } catch (Exception ex) {
+            logger.error("Error occurred while processing rewards: {}", ex.getMessage(), ex);
+            throw new RewardServiceException(ex.getMessage(), true, AuthConstants.FAILED_TO_GET_REWARDS, ex.getCause());
         }
+        if (CollectionUtils.isEmpty(rewards)) {
+            logger.warn("No rewards found");
+            ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.REWARDS_NOT_FOUND, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        logger.info("Returning {} rewards responses.", rewards.size());
+        return new ResponseEntity<>(rewards, HttpStatus.OK);
     }
 
     /**
@@ -67,21 +68,27 @@ public class RewardController {
      * @return RewardResponse containing monthly and total points for the customer
      */
 
-    @GetMapping(value = "/{customerId}")
     public ResponseEntity<?> getRewardsByCustomerId(@PathVariable("customerId") Long customerId) {
-        List<Transaction> transactionList = transactionRepository.findById(customerId);
+        List<Transaction> transactionList;
         try {
+            transactionList = transactionRepository.findById(customerId);
             if (CollectionUtils.isEmpty(transactionList)) {
                 logger.warn("No transactions found for customerId: {}", customerId);
-                ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.RECORDS_NOT_FOUND, HttpStatus.NOT_FOUND);
+                ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.REWARDS_NOT_FOUND, HttpStatus.NOT_FOUND);
                 return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
             }
-            RewardResponse response = rewardService.calculateRewardsByCustomerId(customerId, transactionList);
+            RewardResponse response;
+            try {
+                response = rewardService.calculateRewardsByCustomerId(customerId, transactionList);
+            } catch (Exception ex) {
+                logger.error("Error occurred while calculating rewards for customerId {}: {}", customerId, ex.getMessage(), ex);
+                throw new RewardServiceException(ex.getMessage(), true, AuthConstants.FAILED_TO_GET_REWARDS, ex.getCause());
+            }
+            logger.info("Returning {} rewards response for customer {}.", response, customerId);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error("Error occurred while retrieving transactions for customerId {}: {}", customerId, e.getMessage(), e);
-            ErrorResponse error = appUtil.globalErrorResponse(null, AuthConstants.FAILED_TO_GET_REWARDS, HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            logger.error("Error occurred while retrieving transactions for customerId {}: {}", customerId, ex.getMessage(), ex);
+            throw new RewardServiceException(ex.getMessage(), true, AuthConstants.FAILED_TO_GET_TRANSACTIONS, ex.getCause());
         }
     }
 }

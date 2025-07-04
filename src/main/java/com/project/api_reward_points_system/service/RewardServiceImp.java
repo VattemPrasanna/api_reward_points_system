@@ -59,6 +59,9 @@ public class RewardServiceImp implements RewardService {
      */
     @Override
     public RewardResponse calculateRewardsByCustomerId(Long customerId, List<Transaction> transactionList) {
+        if (customerId == null || transactionList == null || transactionList.isEmpty()) {
+            throw new NullPointerException("Customer ID or transaction list cannot be null or empty.");
+        }
         return calculateRewardsForTransactions(customerId, transactionList);
     }
 
@@ -100,13 +103,16 @@ public class RewardServiceImp implements RewardService {
      * @return Points earned
      */
     public int calculatePoints(double amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Transaction amount cannot be negative: " + amount);
+        }
         int points = 0;
-        if (amount > propertyConfig.getMaximumRange()) {
-            logger.info("Amount {} exceeds maximum range {}. Calculating points accordingly.", amount, propertyConfig.getMaximumRange());
-            points += (int) ((amount - propertyConfig.getMaximumRange()) * propertyConfig.getPointsPerDollar() + propertyConfig.getMinimumRange());
-        } else if (amount > propertyConfig.getMinimumRange()) {
-            logger.info("Amount {} is within the range {} - {}. Calculating points accordingly.", amount, propertyConfig.getMinimumRange(), propertyConfig.getMaximumRange());
-            points += (int) (amount - propertyConfig.getMinimumRange());
+        if (amount > 100) {
+            logger.info("Amount {} exceeds maximum range $100. Calculating points accordingly.", amount);
+            points += (int) ((amount - 100) * 2 + 50);
+        } else if (amount > 50) {
+            logger.info("Amount {} is within the range $50 - $100. Calculating points accordingly.", amount);
+            points += (int) (amount - 50);
         }
         return points;
     }
