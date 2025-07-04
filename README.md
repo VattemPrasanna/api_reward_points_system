@@ -65,17 +65,26 @@ build.gradle
 
 
 ### API Endpoints
-
+```
 To Fetch all Customer Rewards:
 http://www.localhost:8080/api/rewards
 
 To Fetch specific Customer Rewards:
 http://www.localhost:8080/api/rewards/{customerId}
+```
 
-- **GET /rewards**  
+
+- **GET /api/rewards**  
   Returns a list of customer rewards.  
   If no rewards are found, returns an error response.
   If exception occurred, returns an error response.
+
+
+GET /api/rewards/{customerId}
+
+Returns a specific customer rewards.  
+If no rewards are found, returns an error response.
+If exception occurred, returns an error response.
 
 **Sample Response for success:**
 ```json
